@@ -39,7 +39,7 @@ curl -X POST \
   -d '{
         "source_address": "3E1WB5Y7jxDPT428A3Si6g94L9j7Rt2vt4",
         "outputs": {
-                "mvDvYba71W8at5sU9G8ELqQph8s7fKgbiA": 9999
+                "1HCuHELi5PX8mnLTSkPv27T48K4ig4CJUP": 9999
         },
         "fee_kb": 2500
 }'
