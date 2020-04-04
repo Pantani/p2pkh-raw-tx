@@ -31,18 +31,30 @@ be included in the resulting transaction if the change is > 5430 SAT.
 }
 ```
 
-
+- *Example*:
+```shell script
+curl -X POST \
+  http://localhost:5000/payment_transactions \
+  -H 'Content-Type: application/json' \ 
+  -d '{
+        "source_address": "3E1WB5Y7jxDPT428A3Si6g94L9j7Rt2vt4",
+        "outputs": {
+                "mvDvYba71W8at5sU9G8ELqQph8s7fKgbiA": 9999
+        },
+        "fee_kb": 2500
+}'
+```
 
 ## Running
 
 ### Local
 
 - Install packages and run:
-```shell
+```shell script
 make start
 ```
 OR 
-```shell
+```shell script
 make install-packages
 make run
 ```
@@ -50,34 +62,34 @@ make run
 ## Docker
 
 - Run:
-```shell
+```shell script
 make docker
 ```
 OR
-```shell
+```shell script
 make docker-build
 make docker-run
 ```
 
 - Stop:
-```shell
+```shell script
 make docker-stop
 ```
 
 ### Run unit tests
 
 - Install test packages:
-```shell
+```shell script
 make install-test-packages
 ```
 
 - Run tests:
-```shell
+```shell script
 make test
 ```
 
 ### Help
 
-```shell
+```shell script
 make help
 ```
