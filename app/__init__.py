@@ -11,4 +11,4 @@ api = Api(
     version='1.0',
     description='Create a raw transaction that spends from a P2PKH address.'
 )
-api.add_namespace(payment, path='/api')
+api.add_namespace(payment, path='/')
