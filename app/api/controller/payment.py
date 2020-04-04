@@ -1,10 +1,11 @@
 import logging
 
 from flask import request
-from flask_restplus import Resource
+from flask_restx import Resource
 
 from app.api.service.payment import Payment
 from app.api.model.payment import PaymentRequest
+from app.api.exceptions.exceptions import ApiException
 
 log = logging.getLogger(__name__)
 
@@ -29,6 +30,7 @@ class PaymentTransaction(Resource):
                 fee_kb=post_data["fee_kb"],
             )
             return tx_obj
-        # TODO better error return
-        except Exception as e:
+        except ApiException as e:
             return e.to_dict()
+        except Exception as e:
+            return ApiException(str(e)).to_dict()

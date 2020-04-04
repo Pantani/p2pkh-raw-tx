@@ -6,11 +6,11 @@ from uncertainties import ufloat
 
 from ..config import Config
 from .unspent import Unspent as UnspentService
-from ..exceptions.exceptions import EnoughFunds
+from ..exceptions.exceptions import EnoughFunds, InvalidOutputs
 
 from bitcoin import SelectParams
-from bitcoin.core import b2x, lx, COutPoint, CMutableTxOut, CMutableTxIn, CMutableTransaction
 from bitcoin.wallet import CBitcoinAddress
+from bitcoin.core import b2x, lx, COutPoint, CMutableTxOut, CMutableTxIn, CMutableTransaction
 
 log = logging.getLogger(__name__)
 
@@ -28,7 +28,8 @@ class Payment:
             :return: the fee value
         """
         size = ufloat(input_count * 148 + output_count * 34 + 10, input_count)
-        fee = size * fee_kb
+        fee_bytes = fee_kb / 1000
+        fee = size.nominal_value * fee_bytes
         if fee < Config.MIN_FEE:
             return Config.MIN_FEE
 
@@ -44,24 +45,46 @@ class Payment:
             :param int fee_kb: the fee per kb in SAT
             :return: an list of unspent objects and the transaction fee
         """
-        # Try to find one utxo can satisfy the amount
         fee = Payment.calculate_fee(input_count=1, output_count=output_count, fee_kb=fee_kb)
-        high = [u for u in unspent if u['value'] >= value + fee]
+        high = [u for u in unspent if u['value'] >= (value + fee)]
         high.sort(key=lambda u: u['value'])
         if len(high):
             return [high[0]], fee
 
-        # Append the smalls utxo's to satisfy the amount
-        low = [u for u in unspent if u['value'] < value]
+        low = [u for u in unspent if u['value'] < (value + fee)]
         low.sort(key=lambda u: -u['value'])
         i, tv = 0, 0
-        while tv < value + fee and i < len(low):
-            fee = Payment.calculate_fee(input_count=i, output_count=output_count, fee_kb=fee_kb)
+        while tv < (value + fee) and i < len(low):
             tv += low[i]['value']
             i += 1
+            fee = Payment.calculate_fee(input_count=i, output_count=output_count, fee_kb=fee_kb)
         if tv < value + fee:
             raise EnoughFunds(f'Not enough funds {tv} for value {value}')
         return low[:i], fee
+
+    @staticmethod
+    def create_transaction_object(inputs: List, outputs: Dict[str, Decimal]) -> CMutableTransaction:
+        """
+        Create the transaction object to calculate the raw transaction.
+            :param list inputs: an array of unspent objects
+            :param dict outputs: a dictionary that maps addresses to amounts
+            :return: a transaction object
+        """
+        SelectParams(Config.NETWORK)
+
+        tx_in: List[CMutableTxIn] = []
+        for i in inputs:
+            tx_id = lx(i["tx_hash"])
+            vout = i["tx_index"]
+            tx_in.append(CMutableTxIn(COutPoint(tx_id, vout)))
+
+        tx_out: List[CMutableTxOut] = []
+        for addr, amount in outputs.items():
+            cv = CBitcoinAddress(addr)
+            pk = cv.to_scriptPubKey()
+            tx_out.append(CMutableTxOut(amount, pk))
+
+        return CMutableTransaction(tx_in, tx_out)
 
     @staticmethod
     def create_transaction(source_address: str, outputs: Dict[str, Decimal], fee_kb: int) -> Dict:
@@ -72,6 +95,9 @@ class Payment:
             :param int fee_kb: the fee per kb in SAT
             :return: an dictionary of raw transaction
         """
+        if not outputs:
+            raise InvalidOutputs("invalid outputs: " + str(outputs))
+
         unspent = UnspentService.get_unspent_outputs(address=source_address, confirmations=Config.CONFIRMATIONS)
         unspent_amount = sum([u['value'] for u in unspent])
 
@@ -93,25 +119,3 @@ class Payment:
                 'amount': i['value'],
             } for i in inputs],
         }
-
-    @staticmethod
-    def create_transaction_object(inputs: List, outputs: Dict[str, Decimal]) -> CMutableTransaction:
-        """
-        Create the transaction object to calculate the raw transaction.
-            :param list inputs: an array of unspent objects
-            :param dict outputs: a dictionary that maps addresses to amounts
-            :return: a transaction object
-        """
-        SelectParams(Config.NETWORK)
-
-        tx_in: List[CMutableTxIn] = []
-        for i in inputs:
-            tx_id = lx(i["tx_hash"])
-            vout = i["tx_index"]
-            tx_in.append(CMutableTxIn(COutPoint(tx_id, vout)))
-
-        tx_out: List[CMutableTxOut] = []
-        for addr, amount in outputs.items():
-            tx_out.append(CMutableTxOut(amount, CBitcoinAddress(addr).to_scriptPubKey()))
-
-        return CMutableTransaction(tx_in, tx_out)

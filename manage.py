@@ -1,8 +1,9 @@
 import sys
-import unittest
+
 from app import blueprint
 from flask_script import Manager
 from app.api import start_app
+from app.api.config import ProductionConfig
 
 """ Verify the python version """
 if sys.version_info.major < 3:
@@ -20,20 +21,7 @@ def run():
     """
     Runs the application.
     """
-    app.run()
-
-
-@manager.command
-def test():
-    """
-    Runs the unit tests.
-        :return: int as 0 is a success or 1 if fails.
-    """
-    tests = unittest.TestLoader().discover('app/test', pattern='test*.py')
-    result = unittest.TextTestRunner(verbosity=2).run(tests)
-    if result.wasSuccessful():
-        return 0
-    return 1
+    app.run(debug=ProductionConfig.DEBUG, port=ProductionConfig.PORT, host='0.0.0.0')
 
 
 if __name__ == '__main__':

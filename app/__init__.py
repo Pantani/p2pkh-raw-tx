@@ -1,4 +1,4 @@
-from flask_restplus import Api
+from flask_restx import Api
 from flask import Blueprint
 
 from .api.controller.payment import api as payment

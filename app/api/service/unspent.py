@@ -24,10 +24,15 @@ class Unspent:
             if confirmations is not None:
                 params['confirmations'] = str(confirmations)
             r = requests.get(url=Config.API_URL + '/unspent', params=params)
-            unspent = r.json()["unspent_outputs"][::-1]
+
+            if not r.ok:
+                raise InvalidUnspent("invalid unspent: " + str(r.json()))
+
+            json = r.json()
+            unspent = json["unspent_outputs"][::-1]
 
             log.info(f'{len(unspent)} unspent found for address {address}')
 
             return unspent
         except Exception as e:
-            raise InvalidUnspent("invalid unspent outputs: " + str(e))
+            raise InvalidUnspent("invalid unspent: " + str(e))

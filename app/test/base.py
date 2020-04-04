@@ -8,5 +8,5 @@ class BaseTestCase(TestCase):
     """
 
     def create_app(self):
-        app.config.from_object('app.api.config.TestingConfig')
+        app.config.from_object('app.api.config.DevelopmentConfig')
         return app

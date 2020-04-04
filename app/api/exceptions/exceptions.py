@@ -27,3 +27,8 @@ class EnoughFunds(ApiException):
 class InvalidUnspent(ApiException):
     status_code = 422
     pass
+
+
+class InvalidOutputs(ApiException):
+    status_code = 423
+    pass

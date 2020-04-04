@@ -30,3 +30,54 @@ be included in the resulting transaction if the change is > 5430 SAT.
     }
 }
 ```
+
+
+
+## Running
+
+### Local
+
+- Install packages and run:
+```shell
+make start
+```
+OR 
+```shell
+make install-packages
+make run
+```
+
+## Docker
+
+- Run:
+```shell
+make docker
+```
+OR
+```shell
+make docker-build
+make docker-run
+```
+
+- Stop:
+```shell
+make docker-stop
+```
+
+### Run unit tests
+
+- Install test packages:
+```shell
+make install-test-packages
+```
+
+- Run tests:
+```shell
+make test
+```
+
+### Help
+
+```shell
+make help
+```
