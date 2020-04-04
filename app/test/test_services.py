@@ -135,16 +135,16 @@ def inputs_2() -> List:
 
 @pytest.fixture
 def outputs_1() -> dict:
-    return dict(mvDvYba71W8at5sU9G8ELqQph8s7fKgbiA=Decimal(100000))
+    return {"16moGJwkzWhNC1pfnfJptKj9G1ogQz16xd": Decimal(100000)}
 
 
 @pytest.fixture
 def outputs_2() -> dict:
-    return dict(
-        mhnnkpnCfBkxN5KpfMArye2F376nATVJDW=100000,
-        mvDvYba71W8at5sU9G8ELqQph8s7fKgbiA=2000,
-        msrXsFAeRMLnY9mGPyeVwZZqxqVQUXh4uh=20000000,
-    )
+    return {
+        "34s7MXyL5sEbgsto6SRdvV3YYUu8XVs4xg": 100000,
+        "16moGJwkzWhNC1pfnfJptKj9G1ogQz16xd": 2000,
+        "17A16QmavnUfCW11DAApiJxp7ARnxN5pGX": 20000000,
+    }
 
 
 @pytest.mark.parametrize("input_count,output_count,fee_kb,expected", [
@@ -195,7 +195,7 @@ def test_create_transaction_object_1(inputs_1, outputs_1):
     tx_in: List[CMutableTxIn] = [
         CMutableTxIn(COutPoint(lx('4521418569de2f78d5d2d3c535567ac9c48c95314c53a67788d4dcdc9a8d915b'), 0))]
 
-    pk = CBitcoinAddress('mvDvYba71W8at5sU9G8ELqQph8s7fKgbiA').to_scriptPubKey()
+    pk = CBitcoinAddress('16moGJwkzWhNC1pfnfJptKj9G1ogQz16xd').to_scriptPubKey()
     tx_out: List[CMutableTxOut] = [CMutableTxOut(100000, pk)]
 
     expected = CMutableTransaction(tx_in, tx_out)
@@ -210,9 +210,9 @@ def test_create_transaction_object_2(inputs_2, outputs_2):
         CMutableTxIn(COutPoint(lx('0bb4abea99101197cf2ddf43a2af1e73f868887d5f4a3619241cbb67413a34e7'), 0)),
     ]
 
-    pk1 = CBitcoinAddress('mhnnkpnCfBkxN5KpfMArye2F376nATVJDW').to_scriptPubKey()
-    pk2 = CBitcoinAddress('mvDvYba71W8at5sU9G8ELqQph8s7fKgbiA').to_scriptPubKey()
-    pk3 = CBitcoinAddress('msrXsFAeRMLnY9mGPyeVwZZqxqVQUXh4uh').to_scriptPubKey()
+    pk1 = CBitcoinAddress('34s7MXyL5sEbgsto6SRdvV3YYUu8XVs4xg').to_scriptPubKey()
+    pk2 = CBitcoinAddress('16moGJwkzWhNC1pfnfJptKj9G1ogQz16xd').to_scriptPubKey()
+    pk3 = CBitcoinAddress('17A16QmavnUfCW11DAApiJxp7ARnxN5pGX').to_scriptPubKey()
     tx_out: List[CMutableTxOut] = [
         CMutableTxOut(100000, pk1),
         CMutableTxOut(2000, pk2),
@@ -256,8 +256,8 @@ def test_create_transaction(mock_get, source_address, outputs_2, valid_fee_kb):
     assert r == {
         "raw": "0100000002e7343a4167bb1c2419364a5f7d8868f8731eafa243df2dcf97111099eaabb40b6a4bd21100ffffffff5b91"
                "8d9adcdcd48877a6534c31958cc4c97a5635c5d3d2d5782fde69854121450000000000ffffffff03a086010000000000"
-               "1976a91418eef1d5d14e8032ca7caacefce7164179320b9388acd0070000000000001976a914a1515aee272e49cd1e2f9"
-               "c3490743c4b232d265088ac002d3101000000001976a91487556ff8cc729dd743ee7bf33302098135b95c5e88ac00000000",
+               "17a91422d11208559f11e4c0392c445775f9160a049e7287d0070000000000001976a9143f518ce9c8ee6939245d980f"
+               "8bc478885340224888ac002d3101000000001976a91443849383122ebb8a28268a89700c9f723663b5b888ac00000000",
         "inputs": [
             {
                 "txid": "0bb4abea99101197cf2ddf43a2af1e73f868887d5f4a3619241cbb67413a34e7",
